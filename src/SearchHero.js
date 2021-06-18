@@ -24,6 +24,7 @@ class SearchHero extends Component{
 				return heroItem.id
 			})	
 		}
+
 		this.setState({
 			heroList: listResult
 		});
@@ -131,15 +132,11 @@ class SearchHero extends Component{
 								)
 							})
 						}
-
-
-
 				</Row>
 			</Container>
 		)
 	}
 }
-
 
 const LoginSchema = Yup.object().shape({
 	name: Yup.string()

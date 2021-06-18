@@ -1,7 +1,7 @@
 import React, { Component} from 'react';
 
 import './Hero.css';
-import {Container, Row, Col, Card, Button, ProgressBar} from 'react-bootstrap';
+import {Container, Row, Col, Card, Button, ProgressBar, Accordion} from 'react-bootstrap';
 import axios from 'axios';
 
 class Stat extends Component{
@@ -188,8 +188,8 @@ class Hero extends Component{
 			workplace: jsoninfo.work.base,
 			height: jsoninfo.appearance.height[1],
 			weight: jsoninfo.appearance.weight[1],
-			eyecolor: jsoninfo.appearance[4],		// How do I reference eye-color
-			haircolor: jsoninfo.appearance[5],
+			eyecolor: jsoninfo.appearance["eye-color"],		// How do I reference eye-color
+			haircolor: jsoninfo.appearance["hair-color"],
 			count: "1"
 			})
 		)
@@ -232,7 +232,28 @@ class Hero extends Component{
 	showDetails = () => {
 		this.getInfo(String(Math.floor(Math.random() * 731) + 1));
 	}
+	renderDetails = () => {
+		var detailsObj = {
+			"Weight": this.state.weight,
+			"Height": this.state.height,
+			"Name": this.state.name,
+			"Alias": this.state.alias,
+			"Eyes color": this.state.eyecolor,
+			"Hair color": this.state.haircolor,
+			"Base": this.state.workplace
+		};
 
+		if (detailsObj.Base.includes(",")) {
+			detailsObj.Base = detailsObj.Base.substr(0, detailsObj.Base.indexOf(','))
+			}
+
+		var detailsList = [];
+		for (var details in detailsObj) {
+			detailsList.push([details, detailsObj[details]]);
+		}		
+		return detailsList
+	}
+	
 	render() {
 		return(
 				<Container fluid className="cardContainer mt-3 mb-3">
@@ -251,27 +272,44 @@ class Hero extends Component{
 											))
 									}
 									</Card.Text>
-									<Row>
-										<Col className="d-flex justify-content-end">
-											<Button onClick={() => this.showDetails()} variant="primary">
-												Details
-											</Button>
-										</Col>
-										<Col className="d-flex justify-content-end">
-											<Button onClick={() => this.props.showCard(this.props.heroGrid)} variant="primary">
-												Remove
-											</Button>
-										</Col>
-									</Row>
-								</div>
-							: 									
-							<Row className="mt-2">
-								<Col className="d-flex justify-content-end">
-									<Button onClick={() => this.props.showCard(this.props.heroGrid)} variant="primary">
-										Add to team
-									</Button>
-								</Col>
-							</Row>
+									<Accordion className="bg-dark text-white">
+										<Row className="mb-3">
+											<Col className="d-flex justify-content-end">
+												<Accordion.Toggle as={Button} eventKey="0" >
+													Details
+												</Accordion.Toggle>
+											</Col>
+											<Col className="d-flex justify-content-end">
+												<Button onClick={() => this.props.showCard(this.props.heroGrid)} variant="primary">
+													Remove
+												</Button>
+											</Col>
+										</Row>
+										<Accordion.Collapse eventKey="0">
+												<Card.Text>
+													{
+													this.renderDetails().map((detail) => (
+														<Row >
+															<Col xs={5} md={5} lg={5}>
+																{detail[0]}
+															</Col>
+															<Col>
+																{detail[1]}
+															</Col>
+														</Row>
+														))
+													}
+												</Card.Text>
+										</Accordion.Collapse>
+									</Accordion>
+								</div>: 	
+								<Row className="mt-2">
+									<Col className="d-flex justify-content-end">
+										<Button onClick={() => this.props.showCard(this.props.heroGrid)} variant="primary">
+											Add to team
+										</Button>
+									</Col>
+								</Row>
 							}
 						</Card.Body>
 					</Card>

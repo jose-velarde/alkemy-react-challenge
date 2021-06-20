@@ -1,74 +1,215 @@
-import React, { Component} from 'react';
+import React, {Component, useState} from 'react';
 
 import './App.css';
-import {Container, Row, Col} from 'react-bootstrap';
+import {Container, Row, Col, Alert, Button} from 'react-bootstrap';
 import {Hero, HeroTeam} from './Hero';
 import {SearchHero} from './SearchHero';
+import {LoginForm} from './LoginForm';
+import axios from 'axios';
+
 
 class App extends Component {
 	constructor(props) {
-		console.log("App created")
+		// console.log("App created")
 		super(props);
-		this.state ={
-			goodHero1: String(Math.floor(Math.random() * 731) + 1),
-			goodHero2: String(Math.floor(Math.random() * 731) + 1),
-			goodHero3: String(Math.floor(Math.random() * 731) + 1),
-			evilHero1: String(Math.floor(Math.random() * 731) + 1),
-			evilHero2: String(Math.floor(Math.random() * 731) + 1),
-			evilHero3: String(Math.floor(Math.random() * 731) + 1),
-			showGoodHero1: true,
-			showGoodHero2: true,
-			showGoodHero3: true,
-			showEvilHero1: true,
-			showEvilHero2: true,
-			showEvilHero3: true,
-			statsData: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-			heroName: ""
+		this.state = {
+			searchJsonList : [],
+			gridJsonList: [],
+			loggedIn : true,
+			repeatedHero : false
 		}
-		this.statsData = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+		this.searchJsonList = []
+		this.gridJsonList = []
 		this.updateFlag = true
-		this.heroName = ""
+		this.jsoninfo = {}
+		this.goodHeroCount = 0
+		this.evilHeroCount = 0
+
+		this.statList = [0, 0, 0, 0, 0, 0, [], []]
+		this.statsData = [0, 0, 0, 0, 0, 0, [], []]
+		this.highestStat = 0
+		this.height = 0
+		this.weight = 0
+		this.teamInfoList = []
+		this.repeatedHero = false
 	}
 
-	handleCallback = (statsData, operation) => {
-		statsData = statsData.map((item) => {
-			item = item.replace(/\s[a-z]+|,/gi, "");
-			if (item==="null"){
-				return 0;
-			}
-			else{
-				return item;
-			}
-		});
-		if(operation){
-			this.statsData = this.statsData.map((item, index) => {
-				return Number(item) + Number(statsData[index]);
+	getInfo = (heroId) => {
+		axios.get("https://superheroapi.com/api.php/10226669230223430/" + heroId)
+			.then((response) => {
+				this.jsoninfo = response.data
 			});
-		}else{
-			this.statsData = this.statsData.map((item, index) => {
-				return Number(item) - Number(statsData[index]);
-			});
-		}
 	}
-	handleShowFlag = (heroNumber) => {
-		let stateName = "show" + heroNumber
+
+	handleSearchList = (jsonlist) => {
+		this.searchJsonList = []
+		for (var details in jsonlist){
+			this.searchJsonList.push(jsonlist[details])
+		}
+		this.setState(() => ({
+			searchJsonList: this.searchJsonList 
+		}))
+	}
+
+	handleAddToTeam = (jsoninfo) =>{
+		this.repeatedHero = false
 		this.setState({
-			[stateName]: !this.state[stateName]
+			repeatedHero : false
 		})
-		// if(this.statsData[8] === 6){
-		// 	this.setState({
-		// 		statsData: this.statsData
-		// 	})
-		// }
+
+		for (var heroCard in this.gridJsonList){
+			if(this.gridJsonList[heroCard].id === jsoninfo.id){
+				console.log("Hero already in team")
+				this.repeatedHero = true
+				this.setState({
+					repeatedHero : true
+				})
+				return 0
+			}
+		}
+		if(this.goodHeroCount === 3){
+			console.log("Too many good Heroes!")
+		}
+		if(this.evilHeroCount === 3){
+			console.log("Too many evil Heroes!")
+		}
+
+		if(this.goodHeroCount < 3 && jsoninfo.biography.alignment === "good"){
+			this.goodHeroCount = this.goodHeroCount + 1
+			this.gridJsonList.push(jsoninfo)
+		} else if (this.evilHeroCount < 3 && jsoninfo.biography.alignment === "bad"){
+			this.evilHeroCount = this.evilHeroCount + 1
+			this.gridJsonList.push(jsoninfo)	
+		}
+
+		this.teamInfoList = this.addTeamInfo(this.gridJsonList)
+
+		this.setState(() => ({
+			gridJsonList: this.gridJsonList
+		}))
+	}
+
+	handleRemoveFromTeam = (heroID) => {
+		var tempList = []
+		this.gridJsonList = this.state.gridJsonList
+
+		for (var heroCard in this.gridJsonList){
+			if(this.gridJsonList[heroCard].id !== heroID){
+				tempList.push(this.gridJsonList[heroCard])
+			} else {
+				if(this.gridJsonList[heroCard].biography.alignment === "good"){
+					this.goodHeroCount = this.goodHeroCount - 1
+				} else if (this.gridJsonList[heroCard].biography.alignment === "bad"){
+					this.evilHeroCount = this.evilHeroCount - 1
+				}
+			}
+		}
+
+		this.gridJsonList = tempList
+
+		if(this.gridJsonList.length === 0){
+			this.teamInfoList = []
+		} else {
+			this.teamInfoList = this.addTeamInfo(this.gridJsonList)
+		}
+
+		this.setState(() => ({
+			gridJsonList: this.gridJsonList
+		}))
+	}
+
+	addTeamInfo = (jsonlist) => {
+		this.statList = [0, 0, 0, 0, 0, 0, [], []]
+
+		for (var heroCard in this.gridJsonList){
+			this.statList[0] += Number(jsonlist[heroCard].powerstats.intelligence)
+			this.statList[1] += Number(jsonlist[heroCard].powerstats.strength)
+			this.statList[2] += Number(jsonlist[heroCard].powerstats.speed)
+			this.statList[3] += Number(jsonlist[heroCard].powerstats.durability)
+			this.statList[4] += Number(jsonlist[heroCard].powerstats.power)
+			this.statList[5] += Number(jsonlist[heroCard].powerstats.combat)
+				
+			this.statList[6].push(jsonlist[heroCard].appearance.height[1])
+			this.statList[7].push(jsonlist[heroCard].appearance.weight[1])
+		}
+
+		this.highestStat = this.sortStats(this.statList)
+		this.highestStat = [this.highestStat[0], this.highestStat[1]/jsonlist.length] 
+		var height = 0
+		var weight = 0
+		this.height = this.castToNumber(this.statList[6])
+		this.weight	= this.castToNumber(this.statList[7])
+		
+		this.height.map((item) => (
+			height += item
+		))		
+		this.weight.map((item) => (
+			weight += item
+		))
+
+		height = height / this.statList[6].length
+		weight = weight / this.statList[7].length
+
+		this.height	= ["Height", height]
+		this.weight = ["Weight", weight]
+		
+		return [this.highestStat, this.weight, this.height]
+	}
+
+	sortStats = (list) => {
+		var statList = {
+			"Intelligence": list[0],
+			"Strength": list[1],
+			"Speed": list[2],
+			"Durability": list[3],
+			"Power": list[4],
+			"Combat": list[5]
+		};
+		var sorted_stats = [];
+		for (var stat in statList) {
+			sorted_stats.push([stat, statList[stat]]);
+		}
+		sorted_stats.sort((a, b) => {
+			return a[1] - b[1];
+		})
+		
+		sorted_stats = sorted_stats.reverse();
+		return sorted_stats[0]
 	}
 	
-	componentDidMount(props, state){
-		console.log("App did Mount")
+	castToNumber = (weight) => {
+		weight = weight.map((item) => {
+			let number = item.replace(/\s[a-z]+|,/gi, "");
+			if (number === "null") {
+				return 0;
+			} else {
+				if(number.includes("tons")){
+					return Number(number)*1000
+				} else {
+					return Number(number)
+				}				
+			}
+		});
+		return weight
 	}
-	componentDidUpdate = () => {
-		this.statsData = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-		console.log("App Updated")
+	handleLogIn = (success) => {
+		if(success){
+			this.setState({
+				loggedIn: true
+			})
+		} else {
+			this.setState({
+				loggedIn: false
+			})
+		}
+		
 	}
+	// componentDidMount(props, state){
+	// 	console.log("App did Mount")
+	// }
+	// componentDidUpdate = () => {
+	// 	console.log("App Updated")
+	// }
 	shouldComponentUpdate() {
 		if (this.updateFlag){
 			return true
@@ -78,117 +219,98 @@ class App extends Component {
 	}
 
 	render() {
+		// console.log("App rendered")
 		return(
 			<Container fluid className="MainContainer">
-				<Container className="NavContainer">
-					<Row>
-						<Col>
-							Super Team Builder!
+				<Container>
+					<Row >
+						<Col className="text-center">
+							<h1>Super Team Builder!</h1>
 						</Col>
 					</Row>
 				</Container>
-				<Container className="FormContainer">
-					{/* <Form>
-						<Row xs={1} md={2} lg={2}>
+			{this.state.loggedIn !== true ?
+				<LoginForm logIn={this.handleLogIn}/>
+				:
+				<div>
+					<Container className="TeamContainer">
+						{/* Team Information Section */}
+						<Row xs={1} className="TeamInfo">
 							<Col>
-								<Form.Group controlId="formEmail">
-									<Form.Label>
-										Email Adress
-									</Form.Label>
-									<Form.Control type="email" placeholder="Example@email.com" />
-									<Form.Text className="text-muted">
-										Your information is protected!
-									</Form.Text>
-								</Form.Group>
-							</Col>
-							<Col>
-								<Form.Group controlId="formPassword">
-									<Form.Label>
-										Password
-									</Form.Label>
-									<Form.Control type="password" placeholder="Password" />
-								</Form.Group>
+								<HeroTeam teamInfo={this.teamInfoList}/>
 							</Col>
 						</Row>
-						<Row xs="auto" md="auto" lg="auto" className="d-flex justify-content-end">
-							<Button variant="secondary">
-								Login
-							</Button>
+						{/* Heroes Grid Section */}
+						<Row xs={1} md={2} lg={3} className="TeamGrid">
+							{this.gridJsonList.map((heroInfo) => {
+								// console.log("From search to search results",heroInfo.id)
+								return (
+									<Col>
+										<Hero
+										heroInfo={heroInfo}
+										heroID = {heroInfo.id}
+										showRemoveButton= {true}
+										removeFromTeam ={this.handleRemoveFromTeam} />
+									</Col>
+								)
+							})}
 						</Row>
-					</Form> */}
-				</Container>
-				<Container className="TeamContainer">
-					<Row xs={1} className="TeamInfo">
-						<Col>
-							{/* statsData is updated after the hero cards are rendered.
-							I need to render HeroTeam last.  */}
-							{this.statsData[8] === 6 ? 		//Display info if team complete
-								<HeroTeam statList={this.statsData}/>
-								: "Team incomplete"}
-						</Col>
-					</Row>
-					<Row xs={1} md={2} lg={3} className="TeamGrid">
-						<Col>
-							{this.state.showGoodHero1 ? 
-								<Hero 
-								heroId={this.state.goodHero1} 
-								heroGrid = "GoodHero1" 
-								showInfo= {true}
-								showCard ={this.handleShowFlag} 
-								parentCallback = {this.handleCallback} />
-							: <h1>Hidden</h1>}
-						</Col>
-						<Col>
-							{this.state.showGoodHero2 ? 
-								<Hero heroId={this.state.goodHero2} 
-								heroGrid = "GoodHero2" 
-								showInfo= {true}
-								showCard ={this.handleShowFlag} 
-								parentCallback = {this.handleCallback} />
-							: <h1>Hidden</h1>}
-						</Col>
-						<Col>
-							{this.state.showGoodHero3 ? 
-								<Hero heroId={this.state.goodHero3} 
-								heroGrid = "GoodHero3" 
-								showInfo= {true}
-								showCard ={this.handleShowFlag} 
-								parentCallback = {this.handleCallback} />
-							: <h1>Hidden</h1>}
-						</Col>
-						<Col>
-							{this.state.showEvilHero1 ? 
-								<Hero heroId={this.state.evilHero1} 
-								heroGrid = "EvilHero1" 
-								showInfo= {true}
-								showCard ={this.handleShowFlag} 
-								parentCallback = {this.handleCallback} />
-							: <h1>Hidden</h1>}
-						</Col>
-						<Col>
-							{this.state.showEvilHero2 ? 
-								<Hero heroId={this.state.evilHero2} 
-								heroGrid = "EvilHero2" 
-								showInfo= {true}
-								showCard ={this.handleShowFlag} 
-								parentCallback = {this.handleCallback} />
-							: <h1>Hidden</h1>}
-						</Col>
-						<Col>
-							{this.state.showEvilHero3 ? 
-								<Hero heroId={this.state.evilHero3} 
-								heroGrid = "EvilHero3" 
-								showInfo= {true}
-								showCard ={this.handleShowFlag} 
-								parentCallback = {this.handleCallback} />
-							: <h1>Hidden</h1>}
-						</Col>
-					</Row>
-				</Container>
-				<SearchHero />
+					</Container>
+
+					<Container className="WarningContainer">
+						{this.goodHeroCount === 3?
+							<AlertDismissibleExample
+							variant = "warning"
+							text={["Can't add more than", <b>3 good heroes!</b>]}
+							/>
+						:
+						<></>
+						}
+						{this.evilHeroCount === 3?
+							<AlertDismissibleExample 
+							variant = "warning"
+							text = {["Can't add more than ", <b>3 evil heroes!</b>]}
+							/>
+						:
+						<></>
+						}
+						{this.repeatedHero === true?
+							<AlertDismissibleExample 
+							variant = "danger"
+							text={["Hero ",<b>already</b>  ," in the Team!"]}
+							/>
+							:
+							<></>
+						}
+					</Container>
+					<SearchHero
+					heroList={this.state.searchJsonList}
+					searchList={this.handleSearchList}
+					addToTeam={this.handleAddToTeam}/>
+				</div>
+			}
 			</Container>
 		)
 	}
+}
+
+function AlertDismissibleExample(props) {
+	const [show, setShow] = useState(true);
+	if (show) {
+		return (
+			<Alert variant={props.variant} onClose={() => setShow(false)} dismissible>
+				{props.text}
+
+			</Alert>
+		);	
+	}
+	return (
+		<Row >
+			<Col className="d-flex justify-content-end mb-2">
+				<Button onClick={() => setShow(true)} variant={props.variant} >Show Warning</Button>
+			</Col>
+		</Row>
+	)
 }
 
 export default App;

@@ -5,10 +5,34 @@
 .MainContainer {
 	background-color: #282c34;
 	min-height: 100vh;
+	min-width: 420px;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	font-size: calc(10px + 2vmin);
+	font-size: calc(10px + 1vmin);
 	color: white;
+}
+
+/* Dismissible button style not working, manual fix 
+https://stackoverflow.com/questions/67592979/react-bootstrap-alert-dismissible-button-without-style
+*/
+.close ::before{
+	content: 'X';
+	visibility: visible;
+	color: "black";
+	font-weight: bold;
+}
+
+.sr-only::before{
+	visibility: hidden;
+}
+
+.close{
+	/*background-color: red; */
+	visibility: hidden;
+	position: absolute;
+	right: 32px;
+	top: 10px;
+	width: 20px;
+	height: 20px;
+	background-color: rgb(247, 12, 12, 0.5);
 }

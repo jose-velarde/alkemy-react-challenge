@@ -2,8 +2,6 @@ import React, { Component} from 'react';
 
 import './Hero.css';
 import {Container, Row, Col, Card, Button, ProgressBar, Accordion} from 'react-bootstrap';
-import axios from 'axios';
-
 class Stat extends Component{
 	// constructor(props){
 	// 	super(props);
@@ -11,8 +9,8 @@ class Stat extends Component{
 	
 	render() {
 		return(
-			<Row xs md lg className="align-items-center mt-1">
-				<Col xs={5} md={6} lg={5}>
+			<Row className="align-items-center mt-1">
+				<Col xs={5} md={6} lg={6}>
 					{this.props.statName}
 				</Col>
 				<Col>
@@ -24,90 +22,62 @@ class Stat extends Component{
 }
 
 class HeroTeam extends Component {
-	constructor(props){
-		super(props);
-		this.state ={
-			statList: this.props.statList
-		}
-	}
+	// constructor(props){
+	// 	super(props);
+	// }
 
-	componentWillReceiveProps(nextProps) {
-		console.log("Prop updated")
-		this.setState({
-			statList: nextProps.statList,
-		}); 
-	}
-
-	sortStats = () => {
-		var statList = {
-			"Intelligence": this.state.statList[0],
-			"Strength": this.state.statList[1],
-			"Speed": this.state.statList[2],
-			"Durability": this.state.statList[3],
-			"Power": this.state.statList[4],
-			"Combat": this.state.statList[5]
-		};
-		var sorted_stats = [];
-		for (var stat in statList) {
-			sorted_stats.push([stat, statList[stat]]);
-		}
-		sorted_stats.sort((a, b) => {
-			return a[1] - b[1];
-		})
-		
-		sorted_stats = sorted_stats.reverse();
-		return [sorted_stats[0]]
-	}
-	// Fill initial cards
-	componentDidMount(props, state){
-		console.log("Team did Mount")
-		this.setState({statList: this.props.statList})
-
-	}
-	componentDidUpdate = () => {
-		console.log("Team Updated")
-	}
-	componentWillUnmount = () => {
-		console.log("Team card removed")
-	}
+	// componentDidMount(props, state){
+	// 	console.log("Team did Mount")
+	// }
+	// componentDidUpdate = () => {
+	// 	console.log("Team Updated")
+	// }
+	// componentWillUnmount = () => {
+	// 	console.log("Team card removed")
+	// }
 	render() {
+		// console.log("Team rendered", this.props.teamInfo.length)
 		return(
 			<Card className="bg-dark text-white">
-				<Card.Body>
-					<Card.Title>
-						Hero Name
-					</Card.Title>
-					<Card.Text>
-						{
-						this.sortStats().map((stat) => (
-							<Row xs md lg className="align-items-center mt-1">
-								<Col xs={5} md={6} lg={5}>
-								{stat[0]}
+				{this.props.teamInfo.length !== 0 ?
+					<Card.Body>
+						<Card.Title>
+							<h2>{this.props.teamInfo[0][0]} Team</h2>
+						</Card.Title>
+						<Card.Text>
+							<Row className="align-items-center mt-1">
+								<Col xs={5} md={3} lg={2}>
+									Accumulated {this.props.teamInfo[0][0]} Stat
 								</Col>
 								<Col>
-									{stat[1]}
+									<ProgressBar now={this.props.teamInfo[0][1]} />
 								</Col>
 							</Row>
-							))
-						}
-						<Row xs md lg className="align-items-center mt-1">
-							<Col xs={5} md={6} lg={5}>
-								Height
-							</Col>
-							<Col>
-								{this.state.statList[6]/this.state.statList[8]}
-							</Col>
-						</Row>
-						<Row xs md lg className="align-items-center mt-1">
-							<Col xs={5} md={6} lg={5}>
-								Weight
-							</Col>
-							<Col>
-								{this.state.statList[7]/this.state.statList[8]}
-							</Col>
-						</Row>
-					</Card.Text>
+							<Row xs md lg className="align-items-center mt-1">
+								<Col xs={5} md={3} lg={2}>
+									Average {this.props.teamInfo[1][0]}
+								</Col>
+								<Col>
+									{Math.floor(this.props.teamInfo[1][1])}
+								</Col>
+							</Row>
+							<Row xs md lg className="align-items-center mt-1">
+								<Col xs={5} md={3} lg={2}>
+									Average {this.props.teamInfo[2][0]}
+								</Col>
+								<Col>
+									{Math.floor(this.props.teamInfo[2][1])}
+								</Col>
+							</Row>
+						</Card.Text>
+					</Card.Body>
+				:
+				<Card.Body>
+					<Card.Title>
+						Add heroes to your Super Team!
+					</Card.Title>
 				</Card.Body>
+				}
 			</Card>
 		)
 	}
@@ -115,107 +85,44 @@ class HeroTeam extends Component {
 class Hero extends Component{
 	constructor(props){
 		// Only called the first time that is rendered, following props are not read
-		console.log("Card created")	 
+		// console.log("Hero created")	 
 		super(props);
-		this.state = { 
-			showCard: true,
-			showDetails: false,
-			// Learn how to make an object of object state and reference the 2nd level
-			id : this.props.heroId,
-			alignment : "",
-			name : "",
-			image : "",
-			intelligence : "",
-			strength : "",
-			speed : "",
-			durability : "",
-			power : "",
-			combat : "",
-			fullname : "",
-			alias : "",
-			workplace : "",
-			height : "",
-			weight : "",
-			eyecolor : "",
-			haircolor : "",	
-			count: "1"
-		};
-		this.statList =[0,0,0,0,0,0,0,0,0]
-	}
-	// Update props for future cards. Deprecated?
-	componentWillReceiveProps(nextProps) {
-		this.setState({
-			showCard: nextProps.showCard,
-		}); 
-		this.getInfo(nextProps.heroId);
-	}
-	// Fill initial cards
-	componentDidMount(props, state){
-		console.log("Hero did Mount")
-		this.getInfo(this.state.id);
-	}
-	componentDidUpdate = () => {
-		console.log("Hero Updated")
-	}
-	componentWillUnmount = () => {
-		console.log("Hero card removed")
-	}
-	// axios get on App returns undefined, learn async
-	getInfo = (heroId) => {
-		axios.get("https://superheroapi.com/api.php/10226669230223430/" + heroId)
-			.then((response) => {
-				this.updateData(response.data)
-			});
+		// Don't use states for everything
+		this.updateData(props.heroInfo)
 	}
 
 	updateData = (jsoninfo) => {
-		this.setState(() => ({
-			// Hero Data
-			id: jsoninfo.id,
-			alignment: jsoninfo.biography.alignment,
-			// Hero Card Info
-			name: jsoninfo.name,
-			image: jsoninfo.image.url,
-			intelligence: jsoninfo.powerstats.intelligence,
-			strength: jsoninfo.powerstats.strength,
-			speed: jsoninfo.powerstats.speed,
-			durability: jsoninfo.powerstats.durability,
-			power: jsoninfo.powerstats.power,
-			combat: jsoninfo.powerstats.combat,
-			// Hero Details Info
-			fullname: jsoninfo.biography[0],
-			alias: jsoninfo.biography.aliases[0],
-			workplace: jsoninfo.work.base,
-			height: jsoninfo.appearance.height[1],
-			weight: jsoninfo.appearance.weight[1],
-			eyecolor: jsoninfo.appearance["eye-color"],		// How do I reference eye-color
-			haircolor: jsoninfo.appearance["hair-color"],
-			count: "1"
-			})
-		)
-		this.statList = [
-			this.state.intelligence,
-			this.state.strength,
-			this.state.speed,
-			this.state.durability,
-			this.state.power,
-			this.state.combat,
-			this.state.weight,
-			this.state.height,
-			this.state.count
-		];
-		// pass info to render team stat list
-		this.props.parentCallback(this.statList, true)
+		// Hero Data
+		this.id= jsoninfo.id;
+		this.alignment= jsoninfo.biography.alignment;
+		// Hero Card Info
+		this.name= jsoninfo.name;
+		this.image= jsoninfo.image.url;
+		this.intelligence= jsoninfo.powerstats.intelligence;
+		this.strength= jsoninfo.powerstats.strength;
+		this.speed= jsoninfo.powerstats.speed;
+		this.durability= jsoninfo.powerstats.durability;
+		this.power= jsoninfo.powerstats.power;
+		this.combat= jsoninfo.powerstats.combat;
+		// Hero Details Info
+		this.fullname= jsoninfo.biography[0];
+		this.alias= jsoninfo.biography.aliases[0];
+		this.workplace= jsoninfo.work.base;
+		this.height= jsoninfo.appearance.height[1];
+		this.weight= jsoninfo.appearance.weight[1];
+		this.eyecolor= jsoninfo.appearance["eye-color"];
+		this.haircolor= jsoninfo.appearance["hair-color"];
+		this.count= "1"
 	}
 
 	sortStats = () => {
 		var statList = {
-			"Intelligence": this.state.intelligence,
-			"Strength": this.state.strength,
-			"Speed": this.state.speed,
-			"Durability": this.state.durability,
-			"Power": this.state.power,
-			"Combat": this.state.combat
+			"Intelligence": this.intelligence,
+			"Strength": this.strength,
+			"Speed": this.speed,
+			"Durability": this.durability,
+			"Power": this.power,
+			"Combat": this.combat
 		};
 		var sorted_stats = [];
 		for (var stat in statList) {
@@ -229,18 +136,15 @@ class Hero extends Component{
 		return sorted_stats
 	}
 
-	showDetails = () => {
-		this.getInfo(String(Math.floor(Math.random() * 731) + 1));
-	}
 	renderDetails = () => {
 		var detailsObj = {
-			"Weight": this.state.weight,
-			"Height": this.state.height,
-			"Name": this.state.name,
-			"Alias": this.state.alias,
-			"Eyes color": this.state.eyecolor,
-			"Hair color": this.state.haircolor,
-			"Base": this.state.workplace
+			"Weight": this.weight,
+			"Height": this.height,
+			"Name": this.name,
+			"Alias": this.alias,
+			"Eyes color": this.eyecolor,
+			"Hair color": this.haircolor,
+			"Base": this.workplace
 		};
 
 		if (detailsObj.Base.includes(",")) {
@@ -253,17 +157,30 @@ class Hero extends Component{
 		}		
 		return detailsList
 	}
+
+	// componentDidMount(props, state){
+	// 	console.log("Hero did Mount")
+	// }
+	// componentDidUpdate = () => {
+	// 	console.log("Hero Updated")
+	// }
+	// componentWillUnmount = () => {
+	// 	console.log("Hero Removed")
+	// }
 	
 	render() {
+		// console.log("Hero Rendered");
+		// Update hero info
+		this.updateData(this.props.heroInfo);
 		return(
-				<Container fluid className="cardContainer mt-3 mb-3">
+				<Container fluid className="cardContainer mt-3 mb-3 px-0">
 					<Card className="bg-dark text-white">
-						<Card.Body>
+						<Card.Body className = "">
 							<Card.Title>
-								{this.state.name}
+								{this.name}
 							</Card.Title>
-							<Card.Img variant="top" src={this.state.image} className="cardImage" />
-							{this.props.showInfo ?
+							<Card.Img variant="top" src={this.image} className="cardImage" />
+							{this.props.showRemoveButton ?
 								<div>
 									<Card.Text>
 									{
@@ -280,7 +197,7 @@ class Hero extends Component{
 												</Accordion.Toggle>
 											</Col>
 											<Col className="d-flex justify-content-end">
-												<Button onClick={() => this.props.showCard(this.props.heroGrid)} variant="primary">
+												<Button onClick={() => this.props.removeFromTeam(this.props.heroID)} variant="primary">
 													Remove
 												</Button>
 											</Col>
@@ -305,7 +222,10 @@ class Hero extends Component{
 								</div>: 	
 								<Row className="mt-2">
 									<Col className="d-flex justify-content-end">
-										<Button onClick={() => this.props.showCard(this.props.heroGrid)} variant="primary">
+										<Button onClick={() => {
+											this.props.addFromSearch(
+												this.props.heroInfo)}} 
+										variant="primary">
 											Add to team
 										</Button>
 									</Col>

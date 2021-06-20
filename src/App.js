@@ -15,7 +15,7 @@ class App extends Component {
 		this.state = {
 			searchJsonList : [],
 			gridJsonList: [],
-			loggedIn : true,	
+			loggedIn : false,	
 			repeatedHero : false
 		}
 		this.searchJsonList = []
@@ -315,5 +315,7 @@ function AlertDismissibleExample(props) {
 		</Row>
 	)
 }
+// for gh-pages deployment
+//  "homepage": "https://jose-velarde.github.io/alkemy-react-challenge",
 
 export default App;

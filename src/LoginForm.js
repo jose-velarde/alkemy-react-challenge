@@ -103,7 +103,7 @@ class LoginForm extends Component{
 							</Col>
 						</Row>
 						{this.state.loginFailed ?
-							<Alert variant="danger">
+							<Alert variant="danger" className="mt-3">
 								Login Failed
 							</Alert>
 						:

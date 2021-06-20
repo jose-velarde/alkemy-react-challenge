@@ -27,7 +27,7 @@ class SearchHero extends Component{
 
 	render(){
 		return(
-			<Container className="SearchContainer">
+			<Container className="SearchContainer mt-2">
 				<Formik
 					initialValues={{ name: ""}}
 					validationSchema={LoginSchema}

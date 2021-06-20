@@ -15,7 +15,7 @@ class App extends Component {
 		this.state = {
 			searchJsonList : [],
 			gridJsonList: [],
-			loggedIn : false,
+			loggedIn : true,	//login bypassed
 			repeatedHero : false
 		}
 		this.searchJsonList = []
@@ -261,7 +261,7 @@ class App extends Component {
 						{this.goodHeroCount === 3?
 							<AlertDismissibleExample
 							variant = "warning"
-							text={["Can't add more than", <b>3 good heroes!</b>]}
+							text={["Can't add more than ", <b>3 good heroes!</b>]}
 							/>
 						:
 						<></>

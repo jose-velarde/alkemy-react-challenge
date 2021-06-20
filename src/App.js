@@ -15,7 +15,7 @@ class App extends Component {
 		this.state = {
 			searchJsonList : [],
 			gridJsonList: [],
-			loggedIn : true,
+			loggedIn : false,
 			repeatedHero : false
 		}
 		this.searchJsonList = []

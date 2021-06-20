@@ -13,13 +13,11 @@ class LoginForm extends Component{
 			loginFailed: false
 		}
 	}
-	
 	// POST to http://challenge-react.alkemy.org/
-	// En el BODY:
 	// Email: challenge@alkemy.org
 	// Password: react
-	// Error de la API: mostrar una alerta
-	// Success: deberá redirigir al Home y almacenar el token obtenido en localStorage.
+
+	// show error notification on login failure
 	handleLoginError = (status, message) => {
 		if(status){
 			this.setState({

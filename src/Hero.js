@@ -2,6 +2,9 @@ import React, { Component} from 'react';
 
 import './Hero.css';
 import {Container, Row, Col, Card, Button, ProgressBar, Accordion} from 'react-bootstrap';
+
+
+// render state name and value bar
 class Stat extends Component{
 	// constructor(props){
 	// 	super(props);
@@ -21,6 +24,7 @@ class Stat extends Component{
 	}
 }
 
+// render team info: weight, height and accumulated stat
 class HeroTeam extends Component {
 	// constructor(props){
 	// 	super(props);
@@ -82,6 +86,7 @@ class HeroTeam extends Component {
 		)
 	}
 }
+// render hero card
 class Hero extends Component{
 	constructor(props){
 		// Only called the first time that is rendered, following props are not read
@@ -90,7 +95,7 @@ class Hero extends Component{
 		// Don't use states for everything
 		this.updateData(props.heroInfo)
 	}
-
+	// process hero jsoninfo into variables
 	updateData = (jsoninfo) => {
 		// Hero Data
 		this.id= jsoninfo.id;
@@ -114,7 +119,7 @@ class Hero extends Component{
 		this.haircolor= jsoninfo.appearance["hair-color"];
 		this.count= "1"
 	}
-
+	// sort stats and return them ordered
 	sortStats = () => {
 		var statList = {
 			"Intelligence": this.intelligence,
@@ -135,7 +140,7 @@ class Hero extends Component{
 		sorted_stats = sorted_stats.reverse();
 		return sorted_stats
 	}
-
+	// get information for details toogle section
 	renderDetails = () => {
 		var detailsObj = {
 			"Weight": this.weight,
@@ -180,7 +185,7 @@ class Hero extends Component{
 								{this.name}
 							</Card.Title>
 							<Card.Img variant="top" src={this.image} className="cardImage" />
-							{this.props.showRemoveButton ?
+							{this.props.showRemoveButton ? // show details and remove button on card
 								<div>
 									<Card.Text>
 									{
@@ -219,7 +224,7 @@ class Hero extends Component{
 												</Card.Text>
 										</Accordion.Collapse>
 									</Accordion>
-								</div>: 	
+								</div>: 	// show add to team button on card
 								<Row className="mt-2">
 									<Col className="d-flex justify-content-end">
 										<Button onClick={() => {

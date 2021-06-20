@@ -15,7 +15,7 @@ class App extends Component {
 		this.state = {
 			searchJsonList : [],
 			gridJsonList: [],
-			loggedIn : false,	
+			loggedIn : true,	
 			repeatedHero : false
 		}
 		this.searchJsonList = []
@@ -33,14 +33,14 @@ class App extends Component {
 		this.teamInfoList = []
 		this.repeatedHero = false
 	}
-
+	// GET request, response contains json info a single hero
 	getInfo = (heroId) => {
 		axios.get("https://superheroapi.com/api.php/10226669230223430/" + heroId)
 			.then((response) => {
 				this.jsoninfo = response.data
 			});
 	}
-
+	// Receive the result of a search, as a list of json info 
 	handleSearchList = (jsonlist) => {
 		this.searchJsonList = []
 		for (var details in jsonlist){
@@ -50,8 +50,9 @@ class App extends Component {
 			searchJsonList: this.searchJsonList 
 		}))
 	}
-
+	// Add hero from the Search Result Grid to the Team Grid
 	handleAddToTeam = (jsoninfo) =>{
+		// if hero is already on the grid show a warning
 		this.repeatedHero = false
 		this.setState({
 			repeatedHero : false
@@ -67,13 +68,15 @@ class App extends Component {
 				return 0
 			}
 		}
+
+		// if the limit of good/evil heroes is reached show a warning
 		if(this.goodHeroCount === 3){
 			console.log("Too many good Heroes!")
 		}
 		if(this.evilHeroCount === 3){
 			console.log("Too many evil Heroes!")
 		}
-
+		// prevent adding heroes 
 		if(this.goodHeroCount < 3 && jsoninfo.biography.alignment === "good"){
 			this.goodHeroCount = this.goodHeroCount + 1
 			this.gridJsonList.push(jsoninfo)
@@ -81,18 +84,18 @@ class App extends Component {
 			this.evilHeroCount = this.evilHeroCount + 1
 			this.gridJsonList.push(jsoninfo)	
 		}
-
+		// calculate weight, height and accumulated stat
 		this.teamInfoList = this.addTeamInfo(this.gridJsonList)
-
+		// update Team Grid
 		this.setState(() => ({
 			gridJsonList: this.gridJsonList
 		}))
 	}
-
+	// remove team from Team Grid
 	handleRemoveFromTeam = (heroID) => {
 		var tempList = []
 		this.gridJsonList = this.state.gridJsonList
-
+		// remove hero and update Team Grid list
 		for (var heroCard in this.gridJsonList){
 			if(this.gridJsonList[heroCard].id !== heroID){
 				tempList.push(this.gridJsonList[heroCard])
@@ -106,18 +109,18 @@ class App extends Component {
 		}
 
 		this.gridJsonList = tempList
-
+		// reset weight, height and accumulated stat if team is deleted completely
 		if(this.gridJsonList.length === 0){
 			this.teamInfoList = []
 		} else {
 			this.teamInfoList = this.addTeamInfo(this.gridJsonList)
 		}
-
+		// update Team Grid
 		this.setState(() => ({
 			gridJsonList: this.gridJsonList
 		}))
 	}
-
+	// calculate weight, height and accumulated stat
 	addTeamInfo = (jsonlist) => {
 		this.statList = [0, 0, 0, 0, 0, 0, [], []]
 
@@ -155,7 +158,7 @@ class App extends Component {
 		
 		return [this.highestStat, this.weight, this.height]
 	}
-
+	// order stats and return the highest stat
 	sortStats = (list) => {
 		var statList = {
 			"Intelligence": list[0],
@@ -176,7 +179,7 @@ class App extends Component {
 		sorted_stats = sorted_stats.reverse();
 		return sorted_stats[0]
 	}
-	
+	// process weight and height, removing characters and casting to int
 	castToNumber = (weight) => {
 		weight = weight.map((item) => {
 			let number = item.replace(/\s[a-z]+|,/gi, "");
@@ -192,6 +195,7 @@ class App extends Component {
 		});
 		return weight
 	}
+	// update login status
 	handleLogIn = (success) => {
 		if(success){
 			this.setState({
@@ -256,7 +260,6 @@ class App extends Component {
 							})}
 						</Row>
 					</Container>
-
 					<Container className="WarningContainer">
 						{this.goodHeroCount === 3?
 							<AlertDismissibleExample

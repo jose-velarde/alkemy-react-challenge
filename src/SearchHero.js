@@ -49,7 +49,7 @@ class SearchHero extends Component{
 							<label htmlFor="name">Add up to 6 heroes!</label>
 						</Row>
 						<Row className="justify-content-end">
-							<Col xs={8} md={10} lg={11} className="form-group">
+							<Col xs={8} md={10} lg={9} className="form-group">
 								<Field
 									type="text"
 									name="name"
@@ -63,7 +63,7 @@ class SearchHero extends Component{
 									className="invalid-feedback fs-6"
 								/>
 							</Col>
-							<Col xs={4} md={2} lg={1} className="align-items-start">
+							<Col xs={4} md={2} lg={3} className="align-items-start">
 								<button
 								type="submit"
 								className="btn btn-primary btn-block align-self-start"
@@ -76,7 +76,7 @@ class SearchHero extends Component{
 					</Form>
 					)}
 				</Formik>
-				<Row xs={1} md={3} lg={4} className="SearchResultGrid">
+				<Row xs={1} md={1} lg={2} className="SearchResultGrid">
 						{// render cards from search result
 							this.props.heroList.map((heroInfo) => {
 								// console.log("From search to search results",heroInfo.id)

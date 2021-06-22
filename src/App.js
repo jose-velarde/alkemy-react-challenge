@@ -15,7 +15,7 @@ class App extends Component {
 		this.state = {
 			searchJsonList : [],
 			gridJsonList: [],
-			loggedIn : false,	
+			loggedIn : false,		// set to true to bypass login
 			repeatedHero : false
 		}
 		this.searchJsonList = []
@@ -208,6 +208,7 @@ class App extends Component {
 		}
 		
 	}
+
 	// componentDidMount(props, state){
 	// 	console.log("App did Mount")
 	// }
@@ -226,7 +227,7 @@ class App extends Component {
 		// console.log("App rendered")
 		return(
 			<Container fluid className="MainContainer">
-				<Container>
+				<Container className="NavSection">
 					<Row >
 						<Col className="text-center">
 							<h1>Super Team Builder!</h1>
@@ -234,63 +235,71 @@ class App extends Component {
 					</Row>
 				</Container>
 			{this.state.loggedIn !== true ?
-				<LoginForm logIn={this.handleLogIn}/>
+				<Container className="LoginSection">
+					<LoginForm logIn={this.handleLogIn}/>
+				</Container>
 				:
-				<div>
-					<Container className="TeamContainer">
-						{/* Team Information Section */}
-						<Row xs={1} className="TeamInfo">
-							<Col>
-								<HeroTeam teamInfo={this.teamInfoList}/>
-							</Col>
-						</Row>
-						{/* Heroes Grid Section */}
-						<Row xs={1} md={2} lg={3} className="TeamGrid">
-							{this.gridJsonList.map((heroInfo) => {
-								// console.log("From search to search results",heroInfo.id)
-								return (
-									<Col>
-										<Hero
-										heroInfo={heroInfo}
-										heroID = {heroInfo.id}
-										showRemoveButton= {true}
-										removeFromTeam ={this.handleRemoveFromTeam} />
-									</Col>
-								)
-							})}
-						</Row>
-					</Container>
-					<Container className="WarningContainer">
-						{this.goodHeroCount === 3?
-							<AlertDismissibleExample
-							variant = "warning"
-							text={["Can't add more than ", <b>3 good heroes!</b>]}
-							/>
-						:
-						<></>
-						}
-						{this.evilHeroCount === 3?
-							<AlertDismissibleExample 
-							variant = "warning"
-							text = {["Can't add more than ", <b>3 evil heroes!</b>]}
-							/>
-						:
-						<></>
-						}
-						{this.repeatedHero === true?
-							<AlertDismissibleExample 
-							variant = "danger"
-							text={["Hero ",<b>already</b>  ," in the Team!"]}
-							/>
-							:
-							<></>
-						}
-					</Container>
-					<SearchHero
-					heroList={this.state.searchJsonList}
-					searchList={this.handleSearchList}
-					addToTeam={this.handleAddToTeam}/>
-				</div>
+				<Row >
+					<Col xs={12} md lg={8} className="TeamSection">
+						<Container >
+							{/* Team Information Section */}
+							<Row xs={1} className="TeamInfo sticky-top">
+								<Col>
+									<HeroTeam teamInfo={this.teamInfoList}/>
+								</Col>
+							</Row>
+							{/* Warnings Section */}
+							<Container className="WarningContainer">
+								{this.goodHeroCount === 3?
+									<AlertDismissibleExample
+									variant = "warning"
+									text={["Can't add more than ", <b>3 good heroes!</b>]}
+									/>
+								:
+								<></>
+								}
+								{this.evilHeroCount === 3?
+									<AlertDismissibleExample
+									variant = "warning"
+									text = {["Can't add more than ", <b>3 evil heroes!</b>]}
+									/>
+								:
+								<></>
+								}
+								{this.repeatedHero === true?
+									<AlertDismissibleExample
+									variant = "danger"
+									text={["Hero ",<b>already</b>  ," in the Team!"]}
+									/>
+									:
+									<></>
+								}
+							</Container>							
+							{/* Heroes Grid Section */}
+							<Row xs={1} md={1} lg={2} className="TeamGrid">
+								{this.gridJsonList.map((heroInfo) => {
+									// console.log("From search to search results",heroInfo.id)
+									return (
+										<Col>
+											<Hero
+											heroInfo={heroInfo}
+											heroID = {heroInfo.id}
+											showRemoveButton= {true}
+											removeFromTeam ={this.handleRemoveFromTeam} />
+										</Col>
+									)
+								})}
+							</Row>
+						</Container>
+						
+					</Col>
+					<Col xs={12} md lg={4} className="SearchSection">
+						<SearchHero
+						heroList={this.state.searchJsonList}
+						searchList={this.handleSearchList}
+						addToTeam={this.handleAddToTeam}/>
+					</Col>
+				</Row>
 			}
 			</Container>
 		)
@@ -315,7 +324,9 @@ function AlertDismissibleExample(props) {
 		</Row>
 	)
 }
+
+
 // for gh-pages deployment
-//  "homepage": "https://jose-velarde.github.io/alkemy-react-challenge",
+//  
 
 export default App;

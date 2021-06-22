@@ -50,7 +50,7 @@ class HeroTeam extends Component {
 						</Card.Title>
 						<Card.Text>
 							<Row className="align-items-center mt-1">
-								<Col xs={5} md={3} lg={2}>
+								<Col xs={5} md={6} lg={4}>
 									Accumulated {this.props.teamInfo[0][0]} Stat
 								</Col>
 								<Col>
@@ -58,19 +58,17 @@ class HeroTeam extends Component {
 								</Col>
 							</Row>
 							<Row xs md lg className="align-items-center mt-1">
-								<Col xs={5} md={3} lg={2}>
-									Average {this.props.teamInfo[1][0]}
+								<Col xs={6} md={6} lg={4}>
+									Average {this.props.teamInfo[1][0]} 
 								</Col>
-								<Col>
-									{Math.floor(this.props.teamInfo[1][1])}
+								<Col xs={6} md={6} lg={2}>
+									{Math.floor(this.props.teamInfo[1][1])} Kg.
 								</Col>
-							</Row>
-							<Row xs md lg className="align-items-center mt-1">
-								<Col xs={5} md={3} lg={2}>
+								<Col xs={6} md={6} lg={4}>
 									Average {this.props.teamInfo[2][0]}
 								</Col>
-								<Col>
-									{Math.floor(this.props.teamInfo[2][1])}
+								<Col xs={6} md={6} lg={2}>
+									{Math.floor(this.props.teamInfo[2][1])} cm.
 								</Col>
 							</Row>
 						</Card.Text>
